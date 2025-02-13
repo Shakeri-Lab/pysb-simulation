@@ -109,9 +109,9 @@ def run_simulation(args):
     
     # Configure simulator with optimized settings for single cell
     # Create non-uniform time points with higher resolution at the beginning
-    early_times = np.linspace(0, 600, 24)      # First 10 min, 2-min intervals
-    mid_times = np.linspace(600, 3600, 10)     # Next 50 min, ~16-min intervals
-    late_times = np.linspace(3600, 7200, 5)   # Last 60 min, 60-min intervals
+    early_times = np.linspace(0, 600, 30)      # First 10 min, 2-min intervals
+    mid_times = np.linspace(600, 3600, 20)     # Next 50 min, ~16-min intervals
+    late_times = np.linspace(3600, 7200, 10)   # Last 60 min, 60-min intervals
 
     # Add pre-equilibration period
     equil_time = np.linspace(-600, 0, 4)      # 10 minutes pre-equilibration, ~3-min intervals
@@ -150,6 +150,11 @@ def run_simulation(args):
     integration_time = (time.time() - integration_start) / 60
     logger.info(f"Integration took {integration_time:.2f} minutes")
 
+    # Debug output shows:
+    logger.info(f"Number of time points: {len(output.tout)}")
+    logger.info(f"Time points: {output.tout}")
+    logger.info(f"Shape of species trajectories: {output.species.shape}")
+
     # Save results with metadata
     save_start = time.time()
     with h5py.File(args.output, 'w') as f:
@@ -167,6 +172,22 @@ def run_simulation(args):
     
     total_time = (time.time() - start_time) / 60
     logger.info(f"Total simulation pipeline took {total_time:.2f} minutes")
+
+    def check_hdf5_content(filename):
+        with h5py.File(filename, 'r') as f:
+            print("\nHDF5 File Content:")
+            print("------------------")
+            print("Datasets:", list(f.keys()))
+            print("Time shape:", f['time'][:].shape)
+            print("Time points:", f['time'][:])
+            print("Trajectories shape:", f['trajectories'][:].shape)
+            print("First few trajectory values:", f['trajectories'][0,:10])
+            print("\nMetadata:")
+            print("------------------")
+            for key in f.attrs:
+                print(f"{key}: {f.attrs[key]}")
+
+    check_hdf5_content(args.output)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -67,6 +67,7 @@ python -u src/main.py \
     --drug-concentration 0.0 0.0 \
     --output results/mutant_control.h5 \
     --plot-output results/mutant_control.png
+    --skip-simulation
 
 # # Mutant cells with MEKi
 # python -u src/main.py \
